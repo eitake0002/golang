@@ -22,6 +22,5 @@ func main(){
     go test_func(ch, i)
   }
   <-ch
-  //log.Println(<-ch)
-	log.Print("End all")
+  log.Print("End all")
 }
