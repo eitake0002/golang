@@ -9,6 +9,7 @@ import (
   "reflect"
   "net/http"
   "io/ioutil"
+  "github.com/yukihir0/gec"
 )
 
 type MyWrapper struct{
@@ -16,41 +17,58 @@ type MyWrapper struct{
 }
 
 func (f *MyWrapper) ReadFile() []string {
-  fp, _   := os.Open(f.filename)
-  reader  := bufio.NewScanner(fp)
-  content := []string{}
+  fp, _    := os.Open(f.filename)
+  reader   := bufio.NewScanner(fp)
+  line_num := 0
   for reader.Scan(){
-    //fmt.Println(reader.Text())
-    content = append(content, reader.Text())
+    line_num++
   }
-  //fmt.Println(content)
-  return content
+
+  fp2, _  := os.Open(f.filename)
+  reader2 := bufio.NewScanner(fp2)
+  url_list := make([]string, line_num)
+  i := 0
+  for reader2.Scan(){
+    url_list[i] = reader2.Text()
+    i++
+  }
+  return url_list
 }
 
-func (f *MyWrapper) GetRequest(url string) string {
+func (f *MyWrapper) GetRequest(url string, ch chan string) string {
   resp, err := http.Get(url)
   if err != nil {
     log.Print(err)
   }
-  log.Print(resp)
   body, err := ioutil.ReadAll(resp.Body)
-  //log.Print(body)
-  log.Print(reflect.TypeOf(body))
-  return string(body)
+  text := string(body)
+  opt  := gec.NewOption()
+  opt.Threashold = 150
+  _, title := gec.Analyse(text, opt)
+  ch <- url
+  log.Println(title)
+  return title
 }
 
 func main(){
   start := time.Now()
-  log.Print("Start")
-  fmt.Print("Start")
+  log.Println("Start")
+  fmt.Println("Start")
+  
+  ch := make(chan string)
+  wrapper  := MyWrapper{filename: "url_list.csv"}
+  url_list := wrapper.ReadFile()
 
-  wrapper := MyWrapper{filename: "hello.go"}
-  fmt.Println(reflect.TypeOf(wrapper))
-  content := wrapper.ReadFile()
-  fmt.Println(content)
-  body := wrapper.GetRequest("http://your-news.me")
-  log.Print(body)
+  for _, v := range url_list {
+    go wrapper.GetRequest(v, ch)
+  }
+
+  for i, v := range url_list {
+    fmt.Println("finished :",i,v)
+    <-ch
+  }
 
   end := time.Now()
-  log.Printf("%f sec\n", (end.Sub(start)).Seconds())
+  log.Printf("Exec Time : %f sec\n", (end.Sub(start)).Seconds())
+  var _ = reflect.TypeOf(1)
 }
