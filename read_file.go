@@ -10,7 +10,7 @@ import (
   "net/http"
   "io/ioutil"
   "strconv"
-  //"github.com/yukihir0/gec"
+  "github.com/yukihir0/gec"
 )
 
 type MyWrapper struct{
@@ -55,13 +55,12 @@ func (f *MyWrapper) GetRequest(url string, ch chan int) string {
   }
   body, err := ioutil.ReadAll(resp.Body)
   log.Println(body[0:10])
-  //text := string(body)
-  //opt  := gec.NewOption()
-  //opt.Threashold = 150
-  //_, title := gec.Analyse(text, opt)
+  text := string(body)
+  opt  := gec.NewOption()
+  opt.Threashold = 150
+  _, title := gec.Analyse(text, opt)
   ch <- 1
-  //log.Println(title)
-  title := "test"
+  log.Println(title)
   return title
 }
 
