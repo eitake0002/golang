@@ -11,6 +11,7 @@ import (
   "io/ioutil"
   "strconv"
   "github.com/yukihir0/gec"
+  "mecab"
 )
 
 type MyWrapper struct{
@@ -61,6 +62,8 @@ func (f *MyWrapper) GetRequest(url string, ch chan int) string {
   _, title := gec.Analyse(text, opt)
   ch <- 1
   log.Println(title)
+  mecab_parsed, _ := mecab.Parse(title)
+  log.Println(mecab_parsed)
   return title
 }
 

@@ -1,4 +1,4 @@
-package main
+package mecab
 
 // #cgo CFLAGS: -I/usr/local/include
 // #cgo LDFLAGS: -L/usr/local/lib -lmecab -lstdc++
@@ -7,7 +7,6 @@ package main
 import "C"
 
 import "strings"
-import "log"
 
 /* --------------------------------- */
 /* --- error define                  */
@@ -60,9 +59,3 @@ func Parse(line string) (result []string, err error) {
     return parse, nil
 }
 
-func main(){
-  result, _ := Parse("これはテストです。")
-  for _, v := range result {
-    log.Println(v)
-  }
-}
