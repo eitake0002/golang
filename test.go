@@ -2,12 +2,20 @@ package main
 
 import (
   "log"
-  "my/sample"
 )
 
+type MyStruct struct {
+  name string
+  age  int
+}
+
+func (m *MyStruct) MyFunc() {
+  log.Println("MyFunc()")
+  m.age = 10
+}
+
 func main() {
-  log.Println("Test")
-  sample.Sayhello()
-  sum := sample.Sum(10, 20)
-  log.Println(sum)
+  var my_struct MyStruct
+  my_struct.MyFunc()
+  log.Println(my_struct.age)
 }
