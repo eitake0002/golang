@@ -4,56 +4,34 @@ import (
   "log"
 )
 
-type WrapInterface interface {
-  Calcurator
-}
-
-type Calcurator interface {
-  Sum() int
+// Set interface
+type Calc interface {
+  Sum(int) int
   Add() int
 }
 
+// Set struct
 type MyCalc struct {
-  name string
-  age  int
+  Name string
+  Age  int
 }
 
-func (m *MyCalc) Sum() int {
-  log.Println(m.age)
-  return m.age
+// Connect to interface.
+func (m MyCalc) Sum(i int) int {
+  log.Println(i)
+  return i
 }
-
-func (m *MyCalc) Add() int {
-  log.Println(m.name)
-  return m.age
-}
-
-func (m *MyCalc) Sub() int {
-  return m.age
-}
-
-type MyStruct struct {
-  name string
-  age  int
-}
-
-func (m *MyStruct) Sum() int {
-  return m.age
-}
-func (m *MyStruct) Add() int {
-  return m.age
+// Connect to interface. 
+func (m MyCalc) Add() int {
+  return m.Age
 }
 
 func main() {
-  log.Println("Test")
-  calc := MyCalc{"Taro", 20}
-  var i Calcurator = &calc
-  i.Sum()
-  i.Add()
+  log.Println("Start Interface Sample")
 
-  my_struct := MyStruct{"test", 9999}
-  var my_interface Calcurator = &my_struct
-  log.Println(my_interface.Sum())
-  log.Println(my_interface.Add())
-
+  // MyCalc struct must be pointer.
+  var mc MyCalc
+  var cal Calc
+  cal = mc
+  cal.Sum(10)
 }
