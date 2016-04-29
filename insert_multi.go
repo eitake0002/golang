@@ -9,33 +9,34 @@ import(
 )
 
 func main() {
+  log.Println("Start")
   start := time.Now();
-  //ch := make(chan int, 10)
-  for i := 0; i < 10; i++ {
-    Insert(ch)
+  pal_num := 100
+  ch := make(chan int, pal_num)
+  for i := 0; i < pal_num; i++ {
+    go Insert(ch)
   }
-  //for i := 0; i < 10; i++ {
-  //  <-ch
-  //}
+  for i := 0; i < pal_num; i++ {
+    <-ch
+  }
   end := time.Now();
   log.Printf("%f sec\n",(end.Sub(start)).Seconds())
 }
 
-func Insert() {
-  log.Println("Start")
+func Insert(ch chan int) {
   db, err := sql.Open("mysql", "root:@/dev_test")
   defer db.Close()
-  for i := 0; i < 1000; i++ {
+  for i := 0; i < 100; i++ {
     if err != nil {
       panic(err.Error())
     }
 
     qry := "insert into test_table (name) values ('this is test')"
-    rows, err := db.Exec(qry)
+    _, err := db.Exec(qry)
     if err != nil {
       panic(err.Error())
     }
-    log.Println(rows)
+    //log.Println(rows)
   }
-  //ch <- 1
+  ch <- 1
 }
