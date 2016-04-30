@@ -1,32 +1,41 @@
 package main
-/*
-#include <stdio.h>
-#include <stdlib.h>
-*/
-import "C"
 
 import(
   "log"
-  "bufio"
-  "os"
-  "os/exec"
+  _ "fmt"
+  "time"
+  _ "net/http"
+  _ "io/ioutil"
+  _ "bufio"
+  _ "os"
+  _ "os/exec"
+
+  "github.com/PuerkitoBio/goquery"
 )
+
+func Scraping(url string) []string {
+  doc, err := goquery.NewDocument(url)
+  if err != nil {
+    log.Fatal(err)
+  }
+
+  var url_list []string
+  doc.Find("a").Each(func(_ int, s *goquery.Selection){
+    url, _ := s.Attr("href")
+    url_list = append(url_list, url) 
+  })
+  return url_list
+}
 
 func main() {
   log.Println("Start")
-  s := "test"
-  log.Println(s)
+  start := time.Now();
 
-  cmd := exec.Command("wget", "-r", "-l 10", "http://ja.stackoverflow.com/")
-  stdout, err := cmd.StdoutPipe()
-  if err != nil {
-    log.Println(err)
-    os.Exit(1)
+  url_list := Scraping("http://google.com")
+  for _, v := range url_list {
+    log.Println(v)
   }
-  cmd.Start()
-  scanner := bufio.NewScanner(stdout)
-  for scanner.Scan() {
-    log.Println(scanner.Text())
-  }
-  cmd.Wait()
+
+  end := time.Now();
+  log.Printf("%f秒\n",(end.Sub(start)).Seconds())
 }
