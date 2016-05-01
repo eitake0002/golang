@@ -112,23 +112,30 @@ func (g *GetRequestStruct) ParallelGetRequest(url_list []string) {
 	}
 }
 
+func OutputResult(output int, url_list []string, body_list []string) {
+	if output == 1 {
+		OutputSingleArray(url_list)
+	} else if output == 2 {
+		OutputSingleArray(body_list)
+	}
+}
 func main() {
 	log.Println("Start")
 	start := time.Now()
 
 	depth := flag.Int("l", 3, "link depth")
 	domain := flag.String("d", "http://yahoo.co.jp", "first domain")
+	output := flag.Int("o", 0, "0: no output, 1: output url_list, 2: output body_list")
 	flag.Parse()
 
 	url_list := Spidering(*domain, *depth)
 
 	single_url_list := FmtToSingleArray(url_list)
 
-	//OutputSingleArray(single_url_list)
-
 	get_struct := GetRequestStruct{}
 	get_struct.ParallelGetRequest(single_url_list)
-	//OutputSingleArray(get_struct.BodyList)
+
+	OutputResult(*output, single_url_list, get_struct.BodyList)
 
 	end := time.Now()
 	log.Printf("%f SEC\n", (end.Sub(start)).Seconds())
