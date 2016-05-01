@@ -1,3 +1,4 @@
+// Main package for crawling
 package main
 
 import (
@@ -15,6 +16,8 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+// Scraping link url from anchor tag.
+// Using "goquery" library.
 func Scraping(url string) []string {
 	doc, err := goquery.NewDocument(url)
 	if err != nil {
@@ -32,7 +35,15 @@ func Scraping(url string) []string {
 	return url_list
 }
 
-func Output2Array(ary [][]string) {
+// To output single string array.
+func OutputSingleArray(single_url_list []string) {
+	for _, v := range single_url_list {
+		fmt.Println(v)
+	}
+}
+
+// To ouput double string array.
+func OutputDoubleArray(ary [][]string) {
 	for _, v := range ary {
 		for _, v2 := range v {
 			fmt.Println(v2)
@@ -40,19 +51,31 @@ func Output2Array(ary [][]string) {
 	}
 }
 
+// Formatting [][]string to []string url_list.
+func FmtToSingleArray(url_list [][]string) []string {
+	var single_url_list []string
+	for _, v := range url_list {
+		for _, v2 := range v {
+			single_url_list = append(single_url_list, v2)
+		}
+	}
+	return single_url_list
+}
+
 func main() {
 	log.Println("Start")
 	start := time.Now()
 
-	f := flag.Int("l", 3, "link depth")
+	depth := flag.Int("l", 3, "link depth")
+	domain := flag.String("d", "http://yahoo.co.jp", "first domain")
 	flag.Parse()
 
 	var url_list [][]string
-	for i := 0; i < *f; i++ {
+	for i := 0; i < *depth; i++ {
 		log.Println(i)
 		var urls []string
 		if i == 0 {
-			urls = Scraping("http://yahoo.co.jp")
+			urls = Scraping(*domain)
 		} else {
 			for _, v := range url_list[i-1] {
 				urls = Scraping(v)
@@ -61,8 +84,10 @@ func main() {
 		url_list = append(url_list, urls)
 	}
 
-	Output2Array(url_list)
+	single_url_list := FmtToSingleArray(url_list)
+
+	OutputSingleArray(single_url_list)
 
 	end := time.Now()
-	log.Printf("%f秒\n", (end.Sub(start)).Seconds())
+	log.Printf("%f SEC\n", (end.Sub(start)).Seconds())
 }
