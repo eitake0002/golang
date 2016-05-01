@@ -35,6 +35,25 @@ func Scraping(url string) []string {
 	return url_list
 }
 
+// Spidering links with depth.
+// Wrappering Scraping().
+func Spidering(domain string, depth int) [][]string {
+	var url_list [][]string
+	for i := 0; i < depth; i++ {
+		log.Println(i)
+		var urls []string
+		if i == 0 {
+			urls = Scraping(domain)
+		} else {
+			for _, v := range url_list[i-1] {
+				urls = Scraping(v)
+			}
+		}
+		url_list = append(url_list, urls)
+	}
+	return url_list
+}
+
 // To output single string array.
 func OutputSingleArray(single_url_list []string) {
 	for _, v := range single_url_list {
@@ -101,19 +120,7 @@ func main() {
 	domain := flag.String("d", "http://yahoo.co.jp", "first domain")
 	flag.Parse()
 
-	var url_list [][]string
-	for i := 0; i < *depth; i++ {
-		log.Println(i)
-		var urls []string
-		if i == 0 {
-			urls = Scraping(*domain)
-		} else {
-			for _, v := range url_list[i-1] {
-				urls = Scraping(v)
-			}
-		}
-		url_list = append(url_list, urls)
-	}
+	url_list := Spidering(*domain, *depth)
 
 	single_url_list := FmtToSingleArray(url_list)
 
