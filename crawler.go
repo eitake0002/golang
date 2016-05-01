@@ -112,6 +112,7 @@ func (g *GetRequestStruct) ParallelGetRequest(url_list []string) {
 	}
 }
 
+// Output swithcing with option.
 func OutputResult(output int, url_list []string, body_list []string) {
 	if output == 1 {
 		OutputSingleArray(url_list)
@@ -119,6 +120,7 @@ func OutputResult(output int, url_list []string, body_list []string) {
 		OutputSingleArray(body_list)
 	}
 }
+
 func main() {
 	log.Println("Start")
 	start := time.Now()
