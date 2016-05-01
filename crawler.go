@@ -5,9 +5,9 @@ import (
 	_ "bufio"
 	"flag"
 	"fmt"
-	_ "io/ioutil"
+	"io/ioutil"
 	"log"
-	_ "net/http"
+	"net/http"
 	_ "os"
 	_ "os/exec"
 	"regexp"
@@ -62,6 +62,37 @@ func FmtToSingleArray(url_list [][]string) []string {
 	return single_url_list
 }
 
+type GetRequestStruct struct {
+	BodyList []string
+}
+
+// Exec get request method for ParallelGetRequest().
+func (g *GetRequestStruct) GetRequest(url string, c chan int) {
+	resp, err := http.Get(url)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+	g.BodyList = append(g.BodyList, string(body))
+	c <- 1
+}
+
+// Exec get request with groutine.
+// Using GetRequest().
+func (g *GetRequestStruct) ParallelGetRequest(url_list []string) {
+	ch := make(chan int, 10)
+	for _, v := range url_list {
+		go g.GetRequest(v, ch)
+	}
+	for i := 0; i < len(url_list); i++ {
+		<-ch
+	}
+}
+
 func main() {
 	log.Println("Start")
 	start := time.Now()
@@ -86,7 +117,11 @@ func main() {
 
 	single_url_list := FmtToSingleArray(url_list)
 
-	OutputSingleArray(single_url_list)
+	//OutputSingleArray(single_url_list)
+
+	get_struct := GetRequestStruct{}
+	get_struct.ParallelGetRequest(single_url_list)
+	//OutputSingleArray(get_struct.BodyList)
 
 	end := time.Now()
 	log.Printf("%f SEC\n", (end.Sub(start)).Seconds())
