@@ -2,7 +2,8 @@ package main
 
 import (
 	_ "bufio"
-	_ "fmt"
+	"flag"
+	"fmt"
 	_ "io/ioutil"
 	"log"
 	_ "net/http"
@@ -32,19 +33,22 @@ func Scraping(url string) []string {
 }
 
 func Output2Array(ary [][]string) {
-  for _, v := range ary {
-    for _, v2 := range v {
-      log.Println(v2)
-    }
-  }
+	for _, v := range ary {
+		for _, v2 := range v {
+			fmt.Println(v2)
+		}
+	}
 }
 
 func main() {
 	log.Println("Start")
 	start := time.Now()
 
+	f := flag.Int("l", 3, "link depth")
+	flag.Parse()
+
 	var url_list [][]string
-	for i := 0; i < 3; i++ {
+	for i := 0; i < *f; i++ {
 		log.Println(i)
 		var urls []string
 		if i == 0 {
@@ -57,7 +61,7 @@ func main() {
 		url_list = append(url_list, urls)
 	}
 
-    Output2Array(url_list)
+	Output2Array(url_list)
 
 	end := time.Now()
 	log.Printf("%f秒\n", (end.Sub(start)).Seconds())
